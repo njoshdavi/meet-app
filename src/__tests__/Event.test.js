@@ -1,66 +1,63 @@
-import React from 'react';
-import { shallow } from 'enzyme';
+import React from "react";
+import { shallow } from "enzyme";
+import Event from "../Event";
+import { mockData } from "../mock-data";
 
-import { mockData } from '../mock-data';
+describe("<Event /> component", () => {
+  let EventWrapper;
+  beforeAll(() => {
+    EventWrapper = shallow(<Event event={mockData[0]} />);
+  });
 
-import Event from '../Event';
+  test("render event", () => {
+    expect(EventWrapper.find(".event-visible")).toHaveLength(1);
+  });
 
-describe('<Event /> component', () => {
-    let event;
-    let EventWrapper;
-    beforeAll(() => {
-        event = mockData[0];
-        EventWrapper = shallow(<Event event={event} />);
-    });
+  test("render event summary", () => {
+    expect(EventWrapper.find(".summary")).toHaveLength(1);
+  });
 
-    test('render title in event item', () => {
-        expect(EventWrapper.find('.event-title')).toHaveLength(1);
-    });
+  test("default details window closed", () => {
+    expect(EventWrapper.state("buttonCollapsed")).toBe(true);
+  });
 
-    test('render info in event item', () => {
-        expect(EventWrapper.find('.event-info')).toHaveLength(1);
-    });
+  test("render event description", () => {
+    EventWrapper.setState({ buttonCollapsed: false });
+    expect(EventWrapper.find(".description")).toHaveLength(1);
+  });
 
-    test('render show more button in event item', () => {
-        expect(EventWrapper.find('.details-button')).toHaveLength(1);
-    });
+  test("render event creator", () => {
+    EventWrapper.setState({ buttonCollapsed: false });
+    expect(EventWrapper.find(".creator")).toHaveLength(1);
+  });
 
-    test('event title renders correctly', () => {
-        expect(EventWrapper.find('.event-title').text()).toBe(event.summary);
-    });
+  test("render event location", () => {
+    expect(EventWrapper.find(".location")).toHaveLength(1);
+  });
 
-    test('event info renders correctly', () => {
-        expect(EventWrapper.find('.event-info').text()).toContain(event.start.dateTime);
-        expect(EventWrapper.find('.event-info').text()).toContain(event.start.timeZone);
-        expect(EventWrapper.find('.event-info').text()).toContain(event.location);
-    });
+  test("render event start", () => {
+    EventWrapper.setState({ buttonCollapsed: false });
+    expect(EventWrapper.find(".start")).toHaveLength(1);
+  });
 
-    test('event show/hide details works correctly', () => {
-        expect(EventWrapper.find('.event-details')).toHaveLength(0);
-        EventWrapper.setState({
-            show: true
-        });
-        expect(EventWrapper.find('.event-details').text()).toContain(event.description);
-    });
+  test("render event end", () => {
+    EventWrapper.setState({ buttonCollapsed: false });
+    expect(EventWrapper.find(".end")).toHaveLength(1);
+  });
 
-    test('event info begins hidden', () => {
-        EventWrapper = EventWrapper = shallow(<Event event={event} />);
-        expect(EventWrapper.state('show')).toBe(false);
-    });
+  test("render button for details", () => {
+    expect(EventWrapper.find(".btn-details")).toHaveLength(1);
+  });
 
-    test('when details hidden, clicking details button reveals details', () => {
-        EventWrapper.setState({
-            show: false
-        });
-        EventWrapper.find('.details-button').simulate('click');
-        expect(EventWrapper.state('show')).toEqual(true);
-    });
+  test("show list of event details when expanded", () => {
+    EventWrapper.setState({ buttonCollapsed: true });
+    EventWrapper.find(".btn-details").simulate("click");
+    expect(EventWrapper.state("buttonCollapsed")).toBe(false);
+  });
 
-    test('when details shown, clicking details button hides details', () => {
-        EventWrapper.setState({
-            show: true
-        });
-        EventWrapper.find('.details-button').simulate('click');
-        expect(EventWrapper.state('show')).toEqual(false);
-    });
+  test("hide list of event details when collapsed", () => {
+    EventWrapper.setState({ buttonCollapsed: false });
+    EventWrapper.find(".btn-details").simulate("click");
+    expect(EventWrapper.state("buttonCollapsed")).toBe(true);
+  });
 });
