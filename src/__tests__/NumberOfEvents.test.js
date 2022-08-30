@@ -1,29 +1,48 @@
-import React from 'react';
-import { shallow } from 'enzyme';
+import React from "react";
+import { shallow } from "enzyme";
+import NumberOfEvents from "../NumberOfEvents";
 
-import NumberOfEvents from '../NumberOfEvents';
+describe("<NumberofEvents /> component", () => {
+  let NumberOfEventsWrapper;
+  beforeAll(() => {
+    NumberOfEventsWrapper = shallow(<NumberOfEvents />);
+  });
 
-describe('<NumberOfEvents /> component', () => {
-    let NumberOfEventsWrapper;
-    beforeAll(() => {
-        NumberOfEventsWrapper = shallow(<NumberOfEvents updateEvents={() => { }} />);
+  test("render number of events", () => {
+    expect(NumberOfEventsWrapper.find(".numberOfEvents")).toHaveLength(1);
+  });
+
+  test("default number set at 32", () => {
+    expect(NumberOfEventsWrapper.find("#default").get(0).props.value).toEqual(
+      32
+    );
+  });
+
+  test("input value above 0", () => {
+    NumberOfEventsWrapper.setState({ numberOfEvents: 32 });
+    NumberOfEventsWrapper.find(".default").simulate("change", {
+      target: { value: -10 },
     });
+    expect(NumberOfEventsWrapper.state("numberOfEvents")).toEqual(32);
+  });
 
-    test('render text input in NumberOfEvents', () => {
-        expect(NumberOfEventsWrapper.find('.render-number')).toHaveLength(1);
-    });
+  test("render input form", () => {
+    expect(NumberOfEventsWrapper.find("#default")).toHaveLength(1);
+  });
 
-    test('default number of events is 32', () => {
-        let NumberOfEventsWrapper = shallow(<NumberOfEvents />);
-        expect(NumberOfEventsWrapper.find('.render-number').prop('value')).toBe(32);
+  test("allow user to edit list total", () => {
+    NumberOfEventsWrapper.setState({ numberOfEvents: 32 });
+    NumberOfEventsWrapper.find(".default").simulate("change", {
+      target: { value: 12 },
     });
+    expect(NumberOfEventsWrapper.state("numberOfEvents")).toEqual(12);
+  });
 
-    test('change state when text input changes', () => {
-        NumberOfEventsWrapper.setState({
-            renderNumber: '32'
-        });
-        const eventObject = { target: { value: 6 } };
-        NumberOfEventsWrapper.find('.render-number').simulate('change', eventObject);
-        expect(NumberOfEventsWrapper.state('renderNumber')).toBe(6);
+  test("allow only numbers", () => {
+    NumberOfEventsWrapper.setState({ numberOfEvents: 32 });
+    NumberOfEventsWrapper.find("#default").simulate("change", {
+      target: { value: "" },
     });
+    expect(NumberOfEventsWrapper.state("numberOfEvents")).toEqual(32);
+  });
 });
