@@ -1,41 +1,59 @@
 import React, { Component } from "react";
 
 class Event extends Component {
-    toggleDetails = () => {
-        let string = this.state.show ? 'View details' : 'Hide details';
-        this.setState({ buttonText: string, show: !this.state.show });
-    }
+  state = {
+    buttonCollapsed: true,
+  };
 
-    getDate = (string, zone) => {
-        let date = new Date(string);
-        let dateString = new Intl.DateTimeFormat('en-us', { dateStyle: 'long', timeStyle: 'short' }).format(date);
-        let dateString2 = date.toLocaleDateString('en-us', { timeZone: zone, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', timeZoneName: 'short' });
-        return dateString2;
-    }
+  handleShowDetails() {
+    this.setState({ buttonCollapsed: !this.state.buttonCollapsed });
+  }
 
-    constructor() {
-        super();
-        this.state = {
-            show: false,
-            buttonText: 'View details'
-        }
+  collapsedEvent = () => {
+    if (this.state.buttonCollapsed === false) {
+      return (
+        <div className="event-details">
+          <div className="description">
+            <h3>Description</h3>
+            <em>{this.props.event.description}</em>
+          </div>
+          <div className="creator">
+            <h4>e-mail:</h4>
+            <p>{this.props.event.creator.email}</p>
+          </div>
+          <h4>Date and Time:</h4>
+          <div className="start">
+            <p>{this.props.event.start.dateTime}</p>
+          </div>
+          <div className="end">
+            <p>{this.props.event.end.dateTime}</p>
+          </div>
+        </div>
+      );
     }
+  };
 
-    render() {
-        const { event } = this.props;
-        const { show, buttonText } = this.state;
+  btnText = () => {
+    return `${this.state.buttonCollapsed ? "show" : "hide"} details`;
+  };
 
-        return (
-            <div className="event">
-                <h3 className="event-title">{event.summary}</h3>
-                <div className="event-info">
-                    <div className="event-info_location">{event.location}</div>
-                    <div className="event-info_date">{this.getDate(event.start.dateTime, event.start.timeZone)}</div>
-                </div>
-                {show && <div className="event-details">{event.description}</div>}
-                <button className="details-button" onClick={this.toggleDetails}>{buttonText}</button>
-            </div>
-        );
-    }
+  render() {
+    // console.log(this.props.event);
+    return (
+      // 1-7
+      <div className="event-visible">
+        <h2 className="summary">{this.props.event.summary}</h2>
+        <h3 className="location">{this.props.event.location}</h3>
+        {this.collapsedEvent()}
+        <button
+          onClick={() => this.handleShowDetails()} // 10b & 11b
+          className="btn-details" // 8
+        >
+          {this.btnText()}
+        </button>
+      </div>
+    );
+  }
 }
+
 export default Event;
