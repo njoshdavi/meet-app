@@ -1,61 +1,53 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
 class Alert extends Component {
-    constructor(props) {
-        super(props);
-        this.color = null;
-        this.class = 'alert';
-    }
+  constructor(props) {
+    super(props);
+    this.color = null;
+  }
 
-    getStyle = () => {
-        return {
-            color: this.color,
-        };
-    }
+  getStyle = () => {
+    return {
+      color: this.color,
+    };
+  };
 
-    getClass = () => {
-        return this.class;
-    }
-
-    render() {
-        return (
-            <div className={`alert ${this.getClass()}`}>
-                <p style={this.getStyle()}>{this.props.text}</p>
-            </div>
-        );
-    }
+  render() {
+    return (
+      <div className="Alert">
+        <p style={this.getStyle()}>{this.props.text}</p>
+      </div>
+    );
+  }
 }
 
 class InfoAlert extends Alert {
-    constructor(props) {
-        super(props);
-        this.color = '#606c38';
-        this.class = 'info-alert';
-    }
-}
-
-class WarningAlert extends Alert {
-    constructor(props) {
-        super(props);
-        this.color = 'orange';
-        this.class = 'warning-alert';
-    }
+  constructor(props) {
+    super(props);
+    this.color = "white";
+  }
 }
 
 class ErrorAlert extends Alert {
-    constructor(props) {
-        super(props);
-        this.color = 'red';
-        this.class = 'error-alert';
-    }
+  constructor(props) {
+    super(props);
+    this.color = "red";
+  }
+
+  getStyle = () => {
+    return {
+      color: this.color,
+      fontStyle: "italic",
+    };
+  };
 }
 
-class OfflineAlert extends Alert {
-    constructor(props) {
-        super(props);
-        this.color = 'blue';
-        this.class = 'offline-alert';
-    }
+class OffLineAlert extends Alert {
+  constructor(props) {
+    super(props);
+    this.color = "yellow";
+  }
 }
-
-export { InfoAlert, WarningAlert, ErrorAlert, OfflineAlert };
+export { ErrorAlert };
+export { InfoAlert };
+export { OffLineAlert };
