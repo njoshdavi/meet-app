@@ -1,115 +1,248 @@
-import axios from 'axios';
-import NProgress from 'nprogress';
+@import url(https://fonts.googleapis.com/css?family=Roboto:500);
 
-import { mockData } from './mock-data';
+html {
+  background-color: #141414;
+  color: #ffffff;
+}
 
-/*
-This function takes an events array, then uses map to create a new array with only locations.
-It will also remove all duplicates by creating another new array using the spread operator and spreading a Set.
-The Set will remove all duplicates from the array.
-*/
-export const checkToken = async (accessToken) => {
-    try {
-        const result = await fetch(
-            `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`
-        );
-        return await result.json();
-    } catch (error) {
-        error.json();
-    }
-};
+.App {
+  text-align: center;
+  display: block;
+  margin: auto;
+}
 
-const getToken = async (code) => {
-    try {
-        const encodeCode = encodeURIComponent(code);
-        const response = await fetch(
-            'https://7dz6lq0do3.execute-api.us-east-1.amazonaws.com/dev/api/token' +
-            '/' +
-            encodeCode
-        );
+.App * {
+  box-sizing: border-box;
+}
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const { access_token } = await response.json();
-        access_token && localStorage.setItem('access_token', access_token);
-        return access_token;
-    } catch (error) {
-        error.json();
-    }
-};
+ul {
+  padding: 0;
+  list-style: none;
+}
 
-export const getAccessToken = async () => {
-    const accessToken = localStorage.getItem('access_token');
-    const tokenCheck = accessToken && (await checkToken(accessToken));
+p {
+  margin: 5px 0;
+}
 
-    if (!accessToken || tokenCheck.error) {
-        await localStorage.removeItem('access_token');
-        const searchParams = new URLSearchParams(window.location.search);
-        const code = await searchParams.get('code');
-        if (!code) {
-            const results = await axios.get(
-                'https://7dz6lq0do3.execute-api.us-east-1.amazonaws.com/dev/api/get-auth-url'
-            );
-            const { authUrl } = results.data;
-            return (window.location.href = authUrl);
-        }
-        return code && getToken(code);
-    }
-    return accessToken;
-};
+.Alert p {
+  margin-top: 50px;
+}
 
-export const extractLocations = (events) => {
-    var extractLocations = events.map((event) => event.location);
-    var locations = [...new Set(extractLocations)];
-    return locations;
-};
+.display-none {
+  display: none;
+}
+.showSuggestions {
+  display: block;
+}
 
-const removeQuery = () => {
-    if (window.history.pushState && window.location.pathname) {
-        var newurl =
-            window.location.protocol +
-            '//' +
-            window.location.host +
-            window.location.pathname;
-        window.history.pushState('', '', newurl);
-    } else {
-        newurl = window.location.protocol + '//' + window.location.host;
-        window.history.pushState('', '', newurl);
-    }
-};
+input[type="text"],
+input[type="number"] {
+  padding: 8px 6px 8px 10px;
+  border-radius: 4px;
+  outline: none;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  line-height: 20px;
+  align-self: center;
+  height: 38px;
+  margin-top: 50px;
+}
 
-export const getEvents = async () => {
-    NProgress.start();
+.city {
+  width: 250px;
+}
 
-    if (window.location.href.startsWith('http://localhost')) {
-        console.log('returning mock data');
-        NProgress.done();
-        return mockData;
-    }
+.CitySearch {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 300px;
+  max-width: 300px;
+  margin: auto;
+  /* position: relative; */
+}
 
-    if (!navigator.onLine) {
-        const data = localStorage.getItem('lastEvents');
-        NProgress.done();
-        return data ? JSON.parse(data).events : [];
-    }
+.suggestions {
+  width: 250px;
 
-    const token = await getAccessToken();
+  z-index: 2;
+  align-self: center;
+  margin: 0;
+  top: 43px;
+  font-size: 14px;
+  box-shadow: 10px 10px 16px -12px rgba(0, 0, 0, 0.75);
+}
 
-    if (token) {
-        removeQuery();
-        const url =
-            'https://7dz6lq0do3.execute-api.us-east-1.amazonaws.com/dev/api/get-events' +
-            '/' +
-            token;
-        const result = await axios.get(url);
-        if (result.data) {
-            var locations = extractLocations(result.data.events);
-            localStorage.setItem('lastEvents', JSON.stringify(result.data));
-            localStorage.setItem('locations', JSON.stringify(locations));
-        }
-        NProgress.done();
-        return result.data.events;
-    }
+.suggestions > li {
+  text-align: left;
+  padding: 8px 6px 8px 10px;
+  background-color: #eee;
+  color: #141414;
+  cursor: default;
+}
 
-};
+.suggestions > li:last-child {
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.suggestions > li:hover {
+  background-color: #bcdcdb;
+}
+
+.event-visible {
+  justify-content: center;
+  padding: 10px 10px 35px;
+  margin-bottom: 10px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.default {
+  margin-bottom: 25px;
+}
+
+.details-btn {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.name {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.group-name {
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.going,
+.visibility {
+  font-style: italic;
+}
+
+.description {
+  overflow-x: hidden;
+}
+
+.numberOfEvents {
+  width: 200px;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.button-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 20px;
+  padding: 20px;
+  font-family: sans-serif;
+}
+
+.Alert.CitySearch {
+  position: fixed;
+  top: 20px;
+}
+
+.data-vis-wrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+.data-vis-wrapper .recharts-responsive-container {
+  /* min-width: 100%; */
+  display: flex;
+}
+
+.login-button {
+  color: #494949;
+  text-transform: uppercase;
+  text-decoration: none;
+  background: #ffffff;
+  padding: 20px;
+  border: 4px solid #494949;
+  display: inline-block;
+  transition: all 0.4s ease 0s;
+  min-width: 10rem;
+  margin: 1rem;
+}
+
+.google-btn {
+  width: 184px;
+  height: 42px;
+  margin: 1rem;
+  background-color: #4285f4;
+  border-radius: 2px;
+  box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.25);
+}
+.google-btn:hover {
+  box-shadow: 0 0 6px #4285f4;
+}
+.google-btn:active {
+  background: #1669f2;
+}
+.google-icon-wrapper {
+  position: absolute;
+  margin-top: 1px;
+  margin-left: 1px;
+  width: 40px;
+  height: 40px;
+  border-radius: 2px;
+  background-color: #fff;
+}
+.google-icon {
+  position: absolute;
+  margin-top: 11px;
+  margin-left: -8px;
+  width: 18px;
+  height: 18px;
+}
+.btn-text {
+  float: right;
+  margin: 11px 11px 0 0;
+  color: #fff;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  font-family: "Roboto";
+}
+
+.div.recharts-wrapper {
+  color: #ffffff;
+}
+
+.recharts-responsive-container {
+  min-height: 50vh;
+  min-width: 50vw;
+}
+
+.pie-wrapper {
+  min-width: 50vw;
+  min-height: 50vh;
+}
+
+.scatter-wrapper {
+  min-width: 50vh;
+  min-height: 50vh;
+}
+
+.recharts-surface {
+  max-width: 900px;
+}
+
+@media only screen and (min-width: 992px) {
+  .data-vis-wrapper {
+    flex-direction: row;
+  }
+  .data-vis-wrapper .recharts-responsive-container {
+    flex-basis: 50%;
+    /* max-width: 50%; */
+    /* min-width: auto;  */
+    /* margin: 0 auto; */
+  }
+}
