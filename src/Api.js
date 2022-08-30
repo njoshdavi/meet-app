@@ -1,248 +1,157 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto:500);
+import React, { Component } from "react";
+import "./App.css";
+import EventList from "./EventList";
+import EventGenre from "./EventGenre";
+import CitySearch from "./CitySearch";
+import NumberOfEvents from "./NumberOfEvents";
+import { extractLocations, getEvents, checkToken, getAccessToken } from "./api";
+import { OffLineAlert } from "./Alert";
+import "./nprogress.css";
+import WelcomeScreen from "./WelcomeScreen";
+import {
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
-html {
-  background-color: #141414;
-  color: #ffffff;
-}
+class App extends Component {
+  state = {
+    events: [],
+    locations: [],
+    numberOfEvents: 32,
+    locationSelected: "all",
+    showWelcomeScreen: undefined,
+  };
 
-.App {
-  text-align: center;
-  display: block;
-  margin: auto;
-}
-
-.App * {
-  box-sizing: border-box;
-}
-
-ul {
-  padding: 0;
-  list-style: none;
-}
-
-p {
-  margin: 5px 0;
-}
-
-.Alert p {
-  margin-top: 50px;
-}
-
-.display-none {
-  display: none;
-}
-.showSuggestions {
-  display: block;
-}
-
-input[type="text"],
-input[type="number"] {
-  padding: 8px 6px 8px 10px;
-  border-radius: 4px;
-  outline: none;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  line-height: 20px;
-  align-self: center;
-  height: 38px;
-  margin-top: 50px;
-}
-
-.city {
-  width: 250px;
-}
-
-.CitySearch {
-  display: flex;
-  flex-direction: column;
-  flex-basis: 300px;
-  max-width: 300px;
-  margin: auto;
-  /* position: relative; */
-}
-
-.suggestions {
-  width: 250px;
-
-  z-index: 2;
-  align-self: center;
-  margin: 0;
-  top: 43px;
-  font-size: 14px;
-  box-shadow: 10px 10px 16px -12px rgba(0, 0, 0, 0.75);
-}
-
-.suggestions > li {
-  text-align: left;
-  padding: 8px 6px 8px 10px;
-  background-color: #eee;
-  color: #141414;
-  cursor: default;
-}
-
-.suggestions > li:last-child {
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-}
-
-.suggestions > li:hover {
-  background-color: #bcdcdb;
-}
-
-.event-visible {
-  justify-content: center;
-  padding: 10px 10px 35px;
-  margin-bottom: 10px;
-  text-align: center;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.default {
-  margin-bottom: 25px;
-}
-
-.details-btn {
-  position: absolute;
-  right: 5px;
-  bottom: 5px;
-  padding: 5px 8px;
-  border-radius: 4px;
-  outline: none;
-  cursor: pointer;
-}
-
-.name {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.group-name {
-  text-transform: uppercase;
-  font-size: 14px;
-}
-
-.going,
-.visibility {
-  font-style: italic;
-}
-
-.description {
-  overflow-x: hidden;
-}
-
-.numberOfEvents {
-  width: 200px;
-  margin: 20px auto;
-  text-align: center;
-}
-
-.button-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-gap: 20px;
-  padding: 20px;
-  font-family: sans-serif;
-}
-
-.Alert.CitySearch {
-  position: fixed;
-  top: 20px;
-}
-
-.data-vis-wrapper {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-}
-.data-vis-wrapper .recharts-responsive-container {
-  /* min-width: 100%; */
-  display: flex;
-}
-
-.login-button {
-  color: #494949;
-  text-transform: uppercase;
-  text-decoration: none;
-  background: #ffffff;
-  padding: 20px;
-  border: 4px solid #494949;
-  display: inline-block;
-  transition: all 0.4s ease 0s;
-  min-width: 10rem;
-  margin: 1rem;
-}
-
-.google-btn {
-  width: 184px;
-  height: 42px;
-  margin: 1rem;
-  background-color: #4285f4;
-  border-radius: 2px;
-  box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.25);
-}
-.google-btn:hover {
-  box-shadow: 0 0 6px #4285f4;
-}
-.google-btn:active {
-  background: #1669f2;
-}
-.google-icon-wrapper {
-  position: absolute;
-  margin-top: 1px;
-  margin-left: 1px;
-  width: 40px;
-  height: 40px;
-  border-radius: 2px;
-  background-color: #fff;
-}
-.google-icon {
-  position: absolute;
-  margin-top: 11px;
-  margin-left: -8px;
-  width: 18px;
-  height: 18px;
-}
-.btn-text {
-  float: right;
-  margin: 11px 11px 0 0;
-  color: #fff;
-  font-size: 14px;
-  letter-spacing: 0.2px;
-  font-family: "Roboto";
-}
-
-.div.recharts-wrapper {
-  color: #ffffff;
-}
-
-.recharts-responsive-container {
-  min-height: 50vh;
-  min-width: 50vw;
-}
-
-.pie-wrapper {
-  min-width: 50vw;
-  min-height: 50vh;
-}
-
-.scatter-wrapper {
-  min-width: 50vh;
-  min-height: 50vh;
-}
-
-.recharts-surface {
-  max-width: 900px;
-}
-
-@media only screen and (min-width: 992px) {
-  .data-vis-wrapper {
-    flex-direction: row;
+  async componentDidMount() {
+    this.mounted = true;
+    const accessToken = localStorage.getItem("access_token");
+    const isTokenValid = (await checkToken(accessToken)).error ? false : true;
+    const searchParams = new URLSearchParams(window.location.search);
+    const code = searchParams.get("code");
+    this.setState({ showWelcomeScreen: !(code || isTokenValid) });
+    if ((code || isTokenValid) && this.mounted) {
+      getEvents().then((events) => {
+        if (this.mounted) {
+          let sliceNumber = this.state.numberOfEvents;
+          this.setState({
+            locations: extractLocations(events),
+            events: events.slice(0, sliceNumber),
+          });
+        }
+      });
+    }
   }
-  .data-vis-wrapper .recharts-responsive-container {
-    flex-basis: 50%;
-    /* max-width: 50%; */
-    /* min-width: auto;  */
-    /* margin: 0 auto; */
+
+  componentWillUnmount() {
+    this.mounted = false;
+  }
+
+  updateEvents = (location, maxNumberEvents) => {
+    if (maxNumberEvents === undefined) {
+      maxNumberEvents = this.state.numberOfEvents;
+    } else this.setState({ numberOfEvents: maxNumberEvents });
+    if (location === undefined) {
+      location = this.state.locationSelected;
+    }
+    getEvents().then((events) => {
+      let locationEvents =
+        location === "all"
+          ? events
+          : events.filter((event) => event.location === location);
+      this.setState({
+        events: locationEvents.slice(0, maxNumberEvents),
+        numberOfEvents: maxNumberEvents,
+        locationSelected: location,
+      });
+    });
+  };
+
+  updateNumberEvents = (numberOfEvents) => {
+    this.setState({
+      numberOfEvents,
+    });
+    this.updateEvents(undefined, numberOfEvents);
+  };
+
+  getData = () => {
+    const { locations, events } = this.state;
+    const data = locations.map((location) => {
+      const number = events.filter(
+        (event) => event.location === location
+      ).length;
+      const city = location.split(", ").shift();
+      return { city, number };
+    });
+    return data;
+  };
+
+  render() {
+    if (this.state.showWelcomeScreen === undefined)
+      return <div className="App" />;
+    return (
+      <div className="App">
+        <WelcomeScreen
+          showWelcomeScreen={this.state.showWelcomeScreen}
+          getAccessToken={() => {
+            getAccessToken();
+          }}
+        />
+        <div className="offlineAlert">
+          {!navigator.onLine && (
+            <OffLineAlert text={"You are currently offline!"} />
+          )}
+        </div>
+
+        <h1>Come and see what's going on</h1>
+
+        <CitySearch
+          locations={this.state.locations}
+          updateEvents={this.updateEvents}
+        />
+        <NumberOfEvents
+          updateEvents={this.updateEvents}
+          numberOfEvents={this.state.numberOfEvents}
+        />
+        <div className="data-vis-wrapper">
+          <div className="pie-wrapper">
+            <EventGenre events={this.state.events} />
+          </div>
+          <div className="scatter-wrapper">
+            <ResponsiveContainer>
+              <ScatterChart
+                width={400}
+                height={400}
+                margin={{
+                  top: 20,
+                  right: 20,
+                  bottom: 20,
+                  left: 20,
+                }}
+              >
+                <CartesianGrid />
+                <XAxis type="category" dataKey="city" name="City" />
+                <YAxis
+                  type="number"
+                  dataKey="number"
+                  name="Number of events"
+                  allowDecimals={false}
+                />
+
+                <Tooltip cursor={{ strokeDasharray: "3 3" }} />
+                <Scatter data={this.getData()} fill="#8884d8" />
+              </ScatterChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        <EventList events={this.state.events} />
+      </div>
+    );
   }
 }
+
+export default App;
