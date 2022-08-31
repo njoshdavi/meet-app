@@ -5,19 +5,8 @@
 /.pnp
 .pnp.js
 
-# package directories
-node_modules
-jspm_packages
-
-# serverless directories
-.serverless
-
-# environment variables
-config.json
-
 # testing
 /coverage
-/static-test-site
 
 # production
 /build
